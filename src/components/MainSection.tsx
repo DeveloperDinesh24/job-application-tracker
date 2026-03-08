@@ -1,4 +1,5 @@
 import { useApplications } from '../hooks/useApplications'
+import JobAppsSection from './JobAppsSection'
 import StatsOverview from './StatsOverview'
 
 export default function MainSection() {
@@ -7,6 +8,7 @@ export default function MainSection() {
   return (
     <main className='max-w-7xl mx-auto p-6'>
       <StatsOverview data={data} />
+      <JobAppsSection data={data} />
     </main>
   )
 }
