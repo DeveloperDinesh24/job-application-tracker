@@ -1,12 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Trash2 } from 'lucide-react'
 import type { JobApplication } from '../types/JobApplication'
+import { useDeleteModalStore } from '../store/useDeleteModalStore'
 
 interface JobAppCardProps {
   data?: JobApplication[]
 }
 
 export default function JobAppCard({ data }: JobAppCardProps) {
+  const { openDeleteModal } = useDeleteModalStore()
+
   return (
     <AnimatePresence mode='popLayout'>
       {data?.map((app) => (
@@ -31,7 +34,12 @@ export default function JobAppCard({ data }: JobAppCardProps) {
               </p>
             </div>
             <div className='relative group'>
-              <button className='text-slate-300 hover:text-red-500 transition-colors p-2 cursor-pointer'>
+              <button
+                onClick={() => {
+                  openDeleteModal(app.id, app.company)
+                }}
+                className='text-slate-300 hover:text-red-500 transition-colors p-2 cursor-pointer'
+              >
                 <Trash2 size={20} />
               </button>
             </div>

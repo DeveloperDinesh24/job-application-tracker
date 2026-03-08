@@ -1,5 +1,6 @@
 import { useApplications } from '../hooks/useApplications'
 import AddJobModal from './features/AddJobModal'
+import DeleteConfirmModal from './features/DeleteConfirmModal'
 import JobAppsSection from './JobAppsSection'
 import StatsOverview from './StatsOverview'
 
@@ -11,6 +12,7 @@ export default function MainSection() {
       <StatsOverview data={data} />
       <JobAppsSection data={data} />
       <AddJobModal />
+      <DeleteConfirmModal />
     </main>
   )
 }

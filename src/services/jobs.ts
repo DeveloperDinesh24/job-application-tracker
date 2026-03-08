@@ -18,3 +18,11 @@ export const createJobApplication = async (data: JobApplicationData) => {
 
   return await api.post('/applications', payload)
 }
+
+export const deleteJobApplication = async (id: number) => {
+  return await api.delete('/applications', {
+    params: {
+      id: `eq.${id}`,
+    },
+  })
+}
