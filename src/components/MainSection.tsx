@@ -1,0 +1,12 @@
+import { useApplications } from '../hooks/useApplications'
+import StatsOverview from './StatsOverview'
+
+export default function MainSection() {
+  const { data } = useApplications()
+
+  return (
+    <main className='max-w-7xl mx-auto p-6'>
+      <StatsOverview data={data} />
+    </main>
+  )
+}
