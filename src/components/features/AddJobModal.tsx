@@ -2,23 +2,55 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useModalStore } from '../../store/useModalStore'
 import { useState } from 'react'
-import { formatCurrency } from '../../utils/formatters'
+import { formatCurrency, salaryForDB } from '../../utils/formatters'
+import { createJobApplication } from '../../services/jobs'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddJobModal() {
   const { isOpen, closeModal } = useModalStore()
-
   const [salary, setSalary] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const queryClient = useQueryClient()
 
   const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrency(e.target.value)
     setSalary(formatted)
   }
 
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+
+    const formData = new FormData(e.currentTarget)
+
+    const data = {
+      company: formData.get('company') as string,
+      role: formData.get('role') as string,
+      status: formData.get('status') as
+        | 'Applied'
+        | 'Interviewing'
+        | 'Offer'
+        | 'Rejected',
+      salary: salaryForDB(salary),
+      location: (formData.get('location') as string) || '',
+      notes: (formData.get('notes') as string) || '',
+    }
+    try {
+      await createJobApplication(data)
+      closeModal()
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    } catch (error) {
+      console.error('Failed to save job: ', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
-          {/* --- BACKDROP --- */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -27,14 +59,12 @@ export default function AddJobModal() {
             className='absolute inset-0 bg-slate-900/60 backdrop-blur-sm'
           />
 
-          {/* --- MODAL CONTENT --- */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className='relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden'
           >
-            {/* HEADER */}
             <div className='flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800'>
               <h2 className='text-xl font-bold text-slate-800 dark:text-white'>
                 Add New Application
@@ -47,9 +77,10 @@ export default function AddJobModal() {
               </button>
             </div>
 
-            {/* FORM */}
-            <form className='p-6 space-y-4 max-h-[70vh] overflow-y-auto'>
-              {/* Company & Role */}
+            <form
+              onSubmit={handleSubmit}
+              className='p-6 space-y-4 max-h-[70vh] overflow-y-auto'
+            >
               <div className='grid grid-cols-2 gap-4'>
                 <div className='space-y-1.5'>
                   <label className='text-sm font-semibold flex items-center gap-1'>
@@ -58,6 +89,7 @@ export default function AddJobModal() {
                   <input
                     type='text'
                     placeholder='e.g. Google'
+                    name='company'
                     className='form-input'
                     required
                   />
@@ -69,19 +101,19 @@ export default function AddJobModal() {
                   <input
                     type='text'
                     placeholder='e.g. Frontend Dev'
+                    name='role'
                     className='form-input'
                     required
                   />
                 </div>
               </div>
 
-              {/* Status & Salary */}
               <div className='grid grid-cols-2 gap-4'>
                 <div className='space-y-1.5'>
                   <label className='text-sm font-semibold flex items-center gap-1'>
                     Status <span className='text-red-500'>*</span>
                   </label>
-                  <select className='form-input' required>
+                  <select className='form-input' required name='status'>
                     <option value='Applied'>Applied</option>
                     <option value='Interviewing'>Interviewing</option>
                     <option value='Offer'>Offer</option>
@@ -102,6 +134,7 @@ export default function AddJobModal() {
                       $
                     </span>
                     <input
+                      name='salary'
                       type='text'
                       value={salary}
                       onChange={handleSalaryChange}
@@ -112,10 +145,10 @@ export default function AddJobModal() {
                 </div>
               </div>
 
-              {/* Location */}
               <div className='space-y-1.5'>
                 <label className='text-sm font-semibold'>Location</label>
                 <input
+                  name='location'
                   type='text'
                   placeholder='e.g. Remote / New York'
                   className='form-input'
@@ -123,10 +156,10 @@ export default function AddJobModal() {
                 <p className='text-[10px] text-slate-400'>Optional</p>
               </div>
 
-              {/* Notes */}
               <div className='space-y-1.5'>
                 <label className='text-sm font-semibold'>Notes</label>
                 <textarea
+                  name='notes'
                   rows={3}
                   placeholder='Anything specific about the interview...'
                   className='form-input resize-none'
@@ -134,20 +167,23 @@ export default function AddJobModal() {
                 <p className='text-[10px] text-slate-400'>Optional</p>
               </div>
 
-              {/* ACTION BUTTONS */}
               <div className='flex gap-3 pt-4'>
                 <button
                   type='button'
-                  onClick={closeModal}
+                  onClick={() => {
+                    closeModal()
+                    setSalary('')
+                  }}
                   className='flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors'
                 >
                   Cancel
                 </button>
                 <button
                   type='submit'
+                  disabled={loading}
                   className='flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-500/20 transition-transform active:scale-95'
                 >
-                  Create App
+                  {loading ? 'Creating...' : 'Add Application'}
                 </button>
               </div>
             </form>
