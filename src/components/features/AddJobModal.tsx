@@ -1,9 +1,18 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useModalStore } from '../../store/useModalStore'
+import { useState } from 'react'
+import { formatCurrency } from '../../utils/formatters'
 
 export default function AddJobModal() {
   const { isOpen, closeModal } = useModalStore()
+
+  const [salary, setSalary] = useState('')
+
+  const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCurrency(e.target.value)
+    setSalary(formatted)
+  }
 
   return (
     <AnimatePresence>
@@ -79,13 +88,27 @@ export default function AddJobModal() {
                   </select>
                 </div>
                 <div className='space-y-1.5'>
-                  <label className='text-sm font-semibold'>Salary</label>
-                  <input
-                    type='number'
-                    placeholder='90000'
-                    className='form-input'
-                  />
-                  <p className='text-[10px] text-slate-400'>Optional</p>
+                  <div className='flex justify-between items-center'>
+                    <label className='text-sm font-semibold'>
+                      Salary{' '}
+                      <span className='text-[10px] text-slate-400'>
+                        (Optional)
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className='relative'>
+                    <span className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'>
+                      $
+                    </span>
+                    <input
+                      type='text'
+                      value={salary}
+                      onChange={handleSalaryChange}
+                      placeholder='90,000'
+                      className='form-input pl-7'
+                    />
+                  </div>
                 </div>
               </div>
 
