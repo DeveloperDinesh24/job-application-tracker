@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Trash2 } from 'lucide-react'
-import type { JobApplication } from '../types/JobApplication'
-import { useDeleteModalStore } from '../store/useDeleteModalStore'
+import type { JobApplication } from '../types/job.types'
+import { useDeleteModalStore } from '../../../store/useDeleteModalStore'
 
 interface JobAppCardProps {
   data?: JobApplication[]

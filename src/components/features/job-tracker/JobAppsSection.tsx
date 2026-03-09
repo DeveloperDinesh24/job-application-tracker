@@ -1,4 +1,4 @@
-import type { JobApplication } from '../types/JobApplication'
+import type { JobApplication } from '../types/job.types'
 import JobAppCard from './JobAppCard'
 
 interface JobAppProps {

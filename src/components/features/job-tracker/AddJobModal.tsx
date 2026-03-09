@@ -1,9 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useModalStore } from '../../store/useModalStore'
+import { useModalStore } from '../../../store/useAddModalStore'
 import { useState } from 'react'
-import { formatCurrency, salaryForDB } from '../../utils/formatters'
-import { createJobApplication } from '../../services/jobs'
+import { formatCurrency, salaryForDB } from '../../../utils/formatters'
+import { createJobApplication } from '../services/jobApi'
 import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddJobModal() {

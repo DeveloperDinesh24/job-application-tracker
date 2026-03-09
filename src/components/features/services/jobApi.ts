@@ -1,4 +1,4 @@
-import api from '../api/axios'
+import api from '../../../lib/axios'
 
 interface JobApplicationData {
   company: string

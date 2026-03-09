@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import api from '../api/axios'
+import api from '../../../lib/axios'
 
-import type { JobApplication } from '../types/JobApplication'
+import type { JobApplication } from '../types/job.types'
 
 export const useApplications = () => {
   return useQuery<JobApplication[]>({

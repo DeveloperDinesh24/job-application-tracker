@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sun, Moon, Plus } from 'lucide-react'
 
-import { useModalStore } from '../store/useModalStore'
+import { useModalStore } from '../store/useAddModalStore'
 
 export default function Navbar() {
   const [isDarkMode, setIsDarkMode] = useState(true)

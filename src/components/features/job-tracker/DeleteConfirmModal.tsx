@@ -2,8 +2,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
-import { useDeleteModalStore } from '../../store/useDeleteModalStore'
-import { deleteJobApplication } from '../../services/jobs'
+import { useDeleteModalStore } from '../../../store/useDeleteModalStore'
+import { deleteJobApplication } from '../services/jobApi'
 
 export default function DeleteConfirmModal() {
   const { isOpen, id, companyName, closeDeleteModal } = useDeleteModalStore()

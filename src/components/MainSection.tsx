@@ -1,8 +1,8 @@
-import { useApplications } from '../hooks/useApplications'
-import AddJobModal from './features/AddJobModal'
-import DeleteConfirmModal from './features/DeleteConfirmModal'
-import JobAppsSection from './JobAppsSection'
-import StatsOverview from './StatsOverview'
+import { useApplications } from './features/hooks/useApplications'
+import AddJobModal from './features/job-tracker/AddJobModal'
+import DeleteConfirmModal from './features/job-tracker/DeleteConfirmModal'
+import JobAppsSection from './features/job-tracker/JobAppsSection'
+import StatsOverview from './features/job-tracker/StatsOverview'
 
 export default function MainSection() {
   const { data } = useApplications()
