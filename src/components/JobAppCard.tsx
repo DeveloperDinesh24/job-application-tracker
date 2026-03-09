@@ -23,7 +23,9 @@ export default function JobAppCard({ data }: JobAppCardProps) {
         >
           <div className='flex justify-between items-start'>
             <div>
-              <span className='text-xs font-bold uppercase tracking-wider text-blue-500 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md'>
+              <span
+                className={`text-xs font-bold uppercase tracking-wider ${app.status === 'Interviewing' ? 'text-yellow-500' : app.status === 'Rejected' ? 'text-red-500' : app.status === 'Offer' ? 'text-green-500' : 'text-blue-500'} bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md`}
+              >
                 {app.status}
               </span>
               <h3 className='text-xl font-bold mt-3 text-slate-800 dark:text-slate-100'>
