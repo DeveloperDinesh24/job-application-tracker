@@ -1,28 +1,30 @@
 import api from '../../../lib/axios'
+import type { JobApplication, JobApplicationData } from '../types/job.types'
 
-interface JobApplicationData {
-  company: string
-  role: string
-  status: 'Applied' | 'Interviewing' | 'Offer' | 'Rejected'
-  salary: number
-  location?: string
-  notes?: string
-  created_at?: string
-}
+export const jobApi = {
+  // GET all jobs
+  getAll: async () => {
+    const { data } = await api.get<JobApplication[]>('/applications?select=*')
+    return data
+  },
 
-export const createJobApplication = async (data: JobApplicationData) => {
-  const payload = {
-    ...data,
-    created_at: new Date().toISOString(),
-  }
+  // POST new job
+  create: async (payload: JobApplicationData) => {
+    const body = { ...payload, created_at: new Date().toISOString() }
+    return await api.post('/applications', body)
+  },
 
-  return await api.post('/applications', payload)
-}
+  // PATCH existing job
+  update: async (id: number, payload: Partial<JobApplicationData>) => {
+    return await api.patch('/applications', payload, {
+      params: { id: `eq.${id}` },
+    })
+  },
 
-export const deleteJobApplication = async (id: number) => {
-  return await api.delete('/applications', {
-    params: {
-      id: `eq.${id}`,
-    },
-  })
+  // DELETE job
+  delete: async (id: number) => {
+    return await api.delete('/applications', {
+      params: { id: `eq.${id}` },
+    })
+  },
 }

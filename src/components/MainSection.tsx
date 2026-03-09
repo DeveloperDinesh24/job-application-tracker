@@ -1,4 +1,4 @@
-import { useApplications } from './features/hooks/useApplications'
+import { useApplications } from './features/hooks/useJobs'
 import AddJobModal from './features/job-tracker/AddJobModal'
 import DeleteConfirmModal from './features/job-tracker/DeleteConfirmModal'
 import JobAppsSection from './features/job-tracker/JobAppsSection'

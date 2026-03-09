@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { useDeleteModalStore } from '../../../store/useDeleteModalStore'
-import { deleteJobApplication } from '../services/jobApi'
+import { jobApi } from '../services/jobApi'
 
 export default function DeleteConfirmModal() {
   const { isOpen, id, companyName, closeDeleteModal } = useDeleteModalStore()
@@ -15,7 +15,7 @@ export default function DeleteConfirmModal() {
     setLoading(true)
 
     try {
-      await deleteJobApplication(id)
+      await jobApi.delete(id)
       closeDeleteModal()
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     } catch (err) {

@@ -1,10 +1,9 @@
 import './App.css'
-
 import { motion } from 'framer-motion'
 
 import MainSection from './components/MainSection'
 import Navbar from './components/Navbar'
-import { useApplications } from './components/features/hooks/useApplications'
+import { useApplications } from './components/features/hooks/useJobs'
 
 function App() {
   const { isLoading } = useApplications()

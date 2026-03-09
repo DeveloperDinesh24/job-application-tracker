@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { useModalStore } from '../../../store/useAddModalStore'
 import { useState } from 'react'
 import { formatCurrency, salaryForDB } from '../../../utils/formatters'
-import { createJobApplication } from '../services/jobApi'
+import { jobApi } from '../services/jobApi'
 import { useQueryClient } from '@tanstack/react-query'
 
 export default function AddJobModal() {
@@ -37,7 +37,7 @@ export default function AddJobModal() {
       notes: (formData.get('notes') as string) || '',
     }
     try {
-      await createJobApplication(data)
+      await jobApi.create(data)
       closeModal()
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     } catch (error) {
