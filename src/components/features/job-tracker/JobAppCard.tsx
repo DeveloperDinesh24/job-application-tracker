@@ -1,14 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Trash2 } from 'lucide-react'
-import type { JobApplication } from '../types/job.types'
+import { Pencil, Trash2 } from 'lucide-react'
+import type { JobApp } from '../types/job.types'
 import { useDeleteModalStore } from '../../../store/useDeleteModalStore'
+import { useJobModalStore } from '../../../store/useJobModalStore'
 
 interface JobAppCardProps {
-  data?: JobApplication[]
+  data?: JobApp[]
 }
 
 export default function JobAppCard({ data }: JobAppCardProps) {
   const { openDeleteModal } = useDeleteModalStore()
+  const { openEditModal } = useJobModalStore()
 
   return (
     <AnimatePresence mode='popLayout'>
@@ -35,12 +37,18 @@ export default function JobAppCard({ data }: JobAppCardProps) {
                 {app.role}
               </p>
             </div>
-            <div className='relative group'>
+            <div className='flex items-center gap-1'>
               <button
-                onClick={() => {
-                  openDeleteModal(app.id, app.company)
-                }}
+                onClick={() => openEditModal(app)}
+                className='text-slate-300 hover:text-blue-500 transition-colors p-2 cursor-pointer'
+                title='Edit Application'
+              >
+                <Pencil size={18} />
+              </button>
+              <button
+                onClick={() => openDeleteModal(app.id, app.company)}
                 className='text-slate-300 hover:text-red-500 transition-colors p-2 cursor-pointer'
+                title='Delete Application'
               >
                 <Trash2 size={20} />
               </button>

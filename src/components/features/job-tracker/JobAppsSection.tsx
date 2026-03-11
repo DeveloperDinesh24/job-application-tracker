@@ -1,8 +1,8 @@
-import type { JobApplication } from '../types/job.types'
+import type { JobApp } from '../types/job.types'
 import JobAppCard from './JobAppCard'
 
 interface JobAppProps {
-  data?: JobApplication[]
+  data?: JobApp[]
 }
 
 export default function JobAppsSection({ data }: JobAppProps) {

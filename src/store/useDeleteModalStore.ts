@@ -4,7 +4,7 @@ interface DeleteModalState {
   isOpen: boolean
   id: number | null
   companyName: string
-  // Actions
+
   openDeleteModal: (id: number, companyName: string) => void
   closeDeleteModal: () => void
 }

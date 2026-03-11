@@ -1,45 +1,61 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useModalStore } from '../../../store/useAddModalStore'
-import { useState } from 'react'
+import { useJobModalStore } from '../../../store/useJobModalStore'
+import { useEffect, useState } from 'react'
 import { formatCurrency, salaryForDB } from '../../../utils/formatters'
 import { jobApi } from '../services/jobApi'
-import { useQueryClient } from '@tanstack/react-query'
+import { useJobMutations } from '../hooks/useJobMutation'
+
+type statusType = 'Applied' | 'Interviewing' | 'Offer' | 'Rejected'
+
+const initialState = {
+  company: '',
+  role: '',
+  status: 'Applied' as statusType,
+  salary: 0,
+  location: '',
+  notes: '',
+}
 
 export default function AddJobModal() {
-  const { isOpen, closeModal } = useModalStore()
-  const [salary, setSalary] = useState('')
+  const { isOpen, closeModal, editingJob } = useJobModalStore()
   const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState(initialState)
 
-  const queryClient = useQueryClient()
+  useEffect(() => {
+    if (editingJob) {
+      setFormData({
+        company: editingJob.company,
+        role: editingJob.role,
+        status: editingJob.status,
+        salary: editingJob.salary ?? 0,
+        location: editingJob.location || '',
+        notes: editingJob.notes || '',
+      })
+    } else {
+      setFormData(initialState)
+    }
+  }, [editingJob, isOpen])
 
   const handleSalaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrency(e.target.value)
-    setSalary(formatted)
+    setFormData((prev) => ({ ...prev, salary: salaryForDB(formatted) }))
   }
+
+  const { updateJob } = useJobMutations()
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
 
-    const formData = new FormData(e.currentTarget)
-
-    const data = {
-      company: formData.get('company') as string,
-      role: formData.get('role') as string,
-      status: formData.get('status') as
-        | 'Applied'
-        | 'Interviewing'
-        | 'Offer'
-        | 'Rejected',
-      salary: salaryForDB(salary),
-      location: (formData.get('location') as string) || '',
-      notes: (formData.get('notes') as string) || '',
-    }
     try {
-      await jobApi.create(data)
+      if (editingJob) {
+        await updateJob({ id: editingJob.id, data: formData })
+      } else {
+        await jobApi.create(formData)
+      }
+
       closeModal()
-      queryClient.invalidateQueries({ queryKey: ['applications'] })
     } catch (error) {
       console.error('Failed to save job: ', error)
     } finally {
@@ -67,7 +83,7 @@ export default function AddJobModal() {
           >
             <div className='flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800'>
               <h2 className='text-xl font-bold text-slate-800 dark:text-white'>
-                Add New Application
+                {editingJob ? 'Edit Application' : 'Add New Application'}
               </h2>
               <button
                 onClick={closeModal}
@@ -87,9 +103,12 @@ export default function AddJobModal() {
                     Company <span className='text-red-500'>*</span>
                   </label>
                   <input
+                    value={formData.company}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company: e.target.value })
+                    }
                     type='text'
                     placeholder='e.g. Google'
-                    name='company'
                     className='form-input'
                     required
                   />
@@ -99,9 +118,12 @@ export default function AddJobModal() {
                     Role <span className='text-red-500'>*</span>
                   </label>
                   <input
+                    value={formData.role}
+                    onChange={(e) =>
+                      setFormData({ ...formData, role: e.target.value })
+                    }
                     type='text'
                     placeholder='e.g. Frontend Dev'
-                    name='role'
                     className='form-input'
                     required
                   />
@@ -113,30 +135,38 @@ export default function AddJobModal() {
                   <label className='text-sm font-semibold flex items-center gap-1'>
                     Status <span className='text-red-500'>*</span>
                   </label>
-                  <select className='form-input' required name='status'>
+                  <select
+                    value={formData.status}
+                    className='form-input'
+                    required
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        status: e.target.value as statusType,
+                      })
+                    }
+                  >
                     <option value='Applied'>Applied</option>
                     <option value='Interviewing'>Interviewing</option>
                     <option value='Offer'>Offer</option>
+                    <option value='Rejected'>Rejected</option>
                   </select>
                 </div>
                 <div className='space-y-1.5'>
-                  <div className='flex justify-between items-center'>
-                    <label className='text-sm font-semibold'>
-                      Salary{' '}
-                      <span className='text-[10px] text-slate-400'>
-                        (Optional)
-                      </span>
-                    </label>
-                  </div>
-
+                  <label className='text-sm font-semibold'>
+                    Salary (Optional)
+                  </label>
                   <div className='relative'>
                     <span className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'>
                       $
                     </span>
                     <input
-                      name='salary'
                       type='text'
-                      value={salary}
+                      value={
+                        formData.salary === 0
+                          ? ''
+                          : formatCurrency(formData.salary.toString())
+                      }
                       onChange={handleSalaryChange}
                       placeholder='90,000'
                       className='form-input pl-7'
@@ -148,32 +178,33 @@ export default function AddJobModal() {
               <div className='space-y-1.5'>
                 <label className='text-sm font-semibold'>Location</label>
                 <input
-                  name='location'
+                  value={formData.location}
+                  onChange={(e) =>
+                    setFormData({ ...formData, location: e.target.value })
+                  }
                   type='text'
-                  placeholder='e.g. Remote / New York'
+                  placeholder='e.g. Remote'
                   className='form-input'
                 />
-                <p className='text-[10px] text-slate-400'>Optional</p>
               </div>
 
               <div className='space-y-1.5'>
                 <label className='text-sm font-semibold'>Notes</label>
                 <textarea
-                  name='notes'
+                  value={formData.notes}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
                   rows={3}
-                  placeholder='Anything specific about the interview...'
+                  placeholder='Notes...'
                   className='form-input resize-none'
                 />
-                <p className='text-[10px] text-slate-400'>Optional</p>
               </div>
 
               <div className='flex gap-3 pt-4'>
                 <button
                   type='button'
-                  onClick={() => {
-                    closeModal()
-                    setSalary('')
-                  }}
+                  onClick={closeModal}
                   className='flex-1 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors'
                 >
                   Cancel
@@ -181,9 +212,13 @@ export default function AddJobModal() {
                 <button
                   type='submit'
                   disabled={loading}
-                  className='flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-500/20 transition-transform active:scale-95'
+                  className='flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-500/20 transition-transform active:scale-95 disabled:opacity-50'
                 >
-                  {loading ? 'Creating...' : 'Add Application'}
+                  {loading
+                    ? 'Processing...'
+                    : editingJob
+                      ? 'Update Application'
+                      : 'Add Application'}
                 </button>
               </div>
             </form>

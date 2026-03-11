@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { jobApi } from '../services/jobApi'
+import type { JobAppUpdateData } from '../types/job.types'
 
 export const useJobMutations = () => {
   const queryClient = useQueryClient()
@@ -8,14 +9,13 @@ export const useJobMutations = () => {
   const createMutation = useMutation({
     mutationFn: jobApi.create,
     onSuccess: () => {
-      // This tells the "Waiter" to go get fresh data because the menu changed!
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
   })
 
   // 2. Update Mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) =>
+    mutationFn: ({ id, data }: { id: number; data: JobAppUpdateData }) =>
       jobApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
@@ -31,9 +31,9 @@ export const useJobMutations = () => {
   })
 
   return {
-    createJob: createMutation.mutate,
-    updateJob: updateMutation.mutate,
-    deleteJob: deleteMutation.mutate,
+    createJob: createMutation.mutateAsync,
+    updateJob: updateMutation.mutateAsync,
+    deleteJob: deleteMutation.mutateAsync,
     isPending:
       createMutation.isPending ||
       updateMutation.isPending ||

@@ -1,10 +1,10 @@
 import { Briefcase, CheckCircle, Clock } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-import type { JobApplication } from '../types/job.types'
+import type { JobApp } from '../types/job.types'
 
 interface StatsOverviewProps {
-  data?: JobApplication[]
+  data?: JobApp[]
 }
 
 export default function StatsOverview({ data }: StatsOverviewProps) {

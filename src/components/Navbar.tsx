@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sun, Moon, Plus } from 'lucide-react'
 
-import { useModalStore } from '../store/useAddModalStore'
+import { useJobModalStore } from '../store/useJobModalStore'
 
 export default function Navbar() {
   const [isDarkMode, setIsDarkMode] = useState(true)
-  const { openModal } = useModalStore()
+  const { openAddModal } = useJobModalStore()
 
   return (
     <nav className='p-6 flex justify-between items-center max-w-7xl mx-auto'>
@@ -31,7 +31,7 @@ export default function Navbar() {
         </button>
 
         <button
-          onClick={openModal}
+          onClick={openAddModal}
           className='flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium transition-transform active:scale-95 cursor-pointer'
         >
           <Plus size={18} />
