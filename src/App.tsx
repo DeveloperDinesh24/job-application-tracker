@@ -6,6 +6,12 @@ import DashboardUI from './components/DashboardUI'
 import AuthPage from './components/AuthPage'
 import { useAuthStore } from './store/useAuthStore'
 import { useThemeStore } from './store/useThemeStore'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom'
 
 export default function App() {
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
@@ -45,22 +51,8 @@ export default function App() {
     return <AuthPage />
   }
 
-  const openAuthPopup = () => {
-    const width = 500
-    const height = 600
-    const left = window.screenX + (window.outerWidth - width) / 2
-    const top = window.screenY + (window.outerHeight - height) / 2
-
-    window.open(
-      '/auth',
-      'AuthWindow',
-      `width=${width},height=${height},left=${left},top=${top}`,
-    )
-  }
-
   if (loading) {
     return (
-      // Added theme-aware loading screen
       <div className='h-screen w-screen flex items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white'>
         <div className='animate-pulse font-medium'>Loading...</div>
       </div>
@@ -68,13 +60,39 @@ export default function App() {
   }
 
   return (
-    // Wrap entire app in a div that handles the background transition
-    <div className='min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300'>
-      {!session ? (
-        <LandingPage onLoginClick={openAuthPopup} />
-      ) : (
-        <DashboardUI session={session} />
-      )}
-    </div>
+    <Router>
+      <div className='min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300'>
+        <Routes>
+          <Route path='/auth' element={<AuthPage />} />
+
+          <Route
+            path='/'
+            element={
+              !session ? (
+                <LandingPage
+                  onLoginClick={() => {
+                    const width = 500
+                    const height = 600
+                    const left =
+                      window.screenX + (window.outerWidth - width) / 2
+                    const top =
+                      window.screenY + (window.outerHeight - height) / 2
+                    window.open(
+                      '/auth',
+                      'AuthWindow',
+                      `width=${width},height=${height},left=${left},top=${top}`,
+                    )
+                  }}
+                />
+              ) : (
+                <DashboardUI session={session} />
+              )
+            }
+          />
+
+          <Route path='*' element={<Navigate to='/' />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
