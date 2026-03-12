@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { jobApi } from '../services/jobApi'
-import type { JobAppUpdateData } from '../types/job.types'
+import type { JobAppData, JobAppUpdateData } from '../types/job.types'
 
 export const useJobMutations = () => {
   const queryClient = useQueryClient()
 
   // 1. Create Mutation
   const createMutation = useMutation({
-    mutationFn: jobApi.create,
+    mutationFn: ({ data, userId }: { data: JobAppData; userId: string }) =>
+      jobApi.create({ data, userId }),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },

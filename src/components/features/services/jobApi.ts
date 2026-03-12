@@ -1,30 +1,33 @@
-import api from '../../../lib/axios'
+import { supabase } from '../../../lib/supabase'
 import type { JobApp, JobAppData } from '../types/job.types'
 
 export const jobApi = {
-  // GET all jobs
   getAll: async () => {
-    const { data } = await api.get<JobApp[]>('/applications?select=*')
+    const { data, error } = await supabase
+      .from('applications')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (error) throw error
     return data
   },
 
-  // POST new job
-  create: async (payload: JobAppData) => {
-    const body = { ...payload, created_at: new Date().toISOString() }
-    return await api.post('/applications', body)
+  create: async ({ data, userId }: { data: JobAppData; userId: string }) => {
+    const { error } = await supabase
+      .from('applications')
+      .insert([{ ...data, user_id: userId }])
+    if (error) throw error
   },
 
-  // PATCH existing job
   update: async (id: number, payload: Partial<JobApp>) => {
-    return await api.patch('/applications', payload, {
-      params: { id: `eq.${id}` },
-    })
+    const { error } = await supabase
+      .from('applications')
+      .update(payload)
+      .eq('id', id)
+    if (error) throw error
   },
 
-  // DELETE job
   delete: async (id: number) => {
-    return await api.delete('/applications', {
-      params: { id: `eq.${id}` },
-    })
+    const { error } = await supabase.from('applications').delete().eq('id', id)
+    if (error) throw error
   },
 }

@@ -1,10 +1,10 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion' // Added AnimatePresence
 import { X } from 'lucide-react'
 import { useJobModalStore } from '../../../store/useJobModalStore'
 import { useEffect, useState } from 'react'
 import { formatCurrency, salaryForDB } from '../../../utils/formatters'
-import { jobApi } from '../services/jobApi'
 import { useJobMutations } from '../hooks/useJobMutation'
+import { useAuthStore } from '../../../store/useAuthStore'
 
 type statusType = 'Applied' | 'Interviewing' | 'Offer' | 'Rejected'
 
@@ -21,6 +21,8 @@ export default function AddJobModal() {
   const { isOpen, closeModal, editingJob } = useJobModalStore()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState(initialState)
+  const session = useAuthStore((state) => state.session)
+  const { createJob, updateJob } = useJobMutations()
 
   useEffect(() => {
     if (editingJob) {
@@ -42,26 +44,29 @@ export default function AddJobModal() {
     setFormData((prev) => ({ ...prev, salary: salaryForDB(formatted) }))
   }
 
-  const { updateJob } = useJobMutations()
-
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setLoading(true)
 
+    if (!session?.user) {
+      console.error('No user found in session')
+      return
+    }
+
+    setLoading(true)
     try {
       if (editingJob) {
         await updateJob({ id: editingJob.id, data: formData })
       } else {
-        await jobApi.create(formData)
+        // Pass the data and the user ID correctly
+        await createJob({ data: formData, userId: session.user.id })
       }
-
       closeModal()
     } catch (error) {
       console.error('Failed to save job: ', error)
     } finally {
       setLoading(false)
     }
-  }
+  } // Removed the extra closing brace that was here
 
   return (
     <AnimatePresence>

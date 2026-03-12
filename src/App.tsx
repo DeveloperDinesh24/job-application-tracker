@@ -1,31 +1,62 @@
 import './App.css'
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { supabase } from './lib/supabase' // Ensure this is a named import if that's how it's exported
+import LandingPage from './components/LandingPage'
+import DashboardUI from './components/DashboardUI'
+import AuthPage from './components/AuthPage'
+import { useAuthStore } from './store/useAuthStore'
 
-import MainSection from './components/MainSection'
-import Navbar from './components/Navbar'
-import { useApplications } from './components/features/hooks/useJobs'
+export default function App() {
+  const isAuthWindow = window.location.pathname === '/auth'
 
-function App() {
-  const { isLoading } = useApplications()
+  // 1. Grab both the session and the setter from your store
+  const { session, setSession } = useAuthStore()
+  const [loading, setLoading] = useState(true)
 
-  if (isLoading) {
-    return (
-      <div className='h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900'>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-          className='w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full'
-        />
-      </div>
+  useEffect(() => {
+    // 2. Check current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setLoading(false)
+    })
+
+    // 3. Listen for changes (Login/Logout)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [setSession])
+
+  if (isAuthWindow) {
+    return <AuthPage />
+  }
+
+  const openAuthPopup = () => {
+    const width = 500
+    const height = 600
+    const left = window.screenX + (window.outerWidth - width) / 2
+    const top = window.screenY + (window.outerHeight - height) / 2
+
+    window.open(
+      '/auth',
+      'AuthWindow',
+      `width=${width},height=${height},left=${left},top=${top}`,
     )
   }
 
+  if (loading) return <div>Loading...</div>
+
   return (
-    <div className='min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-500'>
-      <Navbar />
-      <MainSection />
-    </div>
+    <>
+      {/* 4. Now 'session' correctly refers to the state from your store */}
+      {!session ? (
+        <LandingPage onLoginClick={openAuthPopup} />
+      ) : (
+        <DashboardUI session={session} />
+      )}
+    </>
   )
 }
-
-export default App
