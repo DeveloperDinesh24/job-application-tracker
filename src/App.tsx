@@ -17,6 +17,20 @@ export default function App() {
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
   const { session, setSession } = useAuthStore()
   const [loading, setLoading] = useState(true)
+  const isPopup = window.opener !== null
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session)
+      // If this is a popup and we just signed in, try to close it from here too
+      if (session && isPopup) {
+        window.close()
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [setSession])
 
   // Sync Theme with DOM
   useEffect(() => {

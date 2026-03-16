@@ -72,8 +72,7 @@ export default function AuthPage() {
               },
             }}
             theme={isDarkMode ? 'dark' : 'light'}
-            // redirectTo must be the root URL so the main tab picks up the session
-            redirectTo={window.location.origin}
+            redirectTo={`${window.location.origin}/auth`}
           />
         </div>
 
