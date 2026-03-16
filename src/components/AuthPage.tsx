@@ -8,11 +8,23 @@ export default function AuthPage() {
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
 
   useEffect(() => {
-    // Listen for the "SIGNED_IN" event inside the popup
+    // 1. Immediate check: If we have a session (handles OAuth redirects), close now.
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session) {
+        window.close()
+      }
+    }
+
+    checkSession()
+
+    // 2. Event listener: For Email/Password logins that happen without a page reload
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_IN') {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || session) {
         setTimeout(() => {
           window.close()
         }, 500)
@@ -24,7 +36,7 @@ export default function AuthPage() {
 
   return (
     <div className='min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 transition-colors duration-500'>
-      {/* Subtle Background Glow to match Landing Page */}
+      {/* Subtle Background Glow */}
       <div className='absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none' />
 
       <div className='relative z-10 w-full max-w-md'>
@@ -40,7 +52,7 @@ export default function AuthPage() {
         <div className='bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800'>
           <Auth
             supabaseClient={supabase}
-            providers={['google', 'github', 'linkedin']} // Add these here
+            providers={['google', 'github', 'linkedin']}
             appearance={{
               theme: ThemeSupa,
               variables: {
@@ -60,7 +72,7 @@ export default function AuthPage() {
               },
             }}
             theme={isDarkMode ? 'dark' : 'light'}
-            // This makes it so users stay on the site after social login
+            // redirectTo must be the root URL so the main tab picks up the session
             redirectTo={window.location.origin}
           />
         </div>

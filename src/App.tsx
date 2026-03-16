@@ -15,8 +15,6 @@ import {
 
 export default function App() {
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
-  const isAuthWindow = window.location.pathname === '/auth'
-
   const { session, setSession } = useAuthStore()
   const [loading, setLoading] = useState(true)
 
@@ -32,6 +30,7 @@ export default function App() {
     }
   }, [isDarkMode])
 
+  // Auth Session Logic
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -47,10 +46,6 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [setSession])
 
-  if (isAuthWindow) {
-    return <AuthPage />
-  }
-
   if (loading) {
     return (
       <div className='h-screen w-screen flex items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white'>
@@ -63,8 +58,10 @@ export default function App() {
     <Router>
       <div className='min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300'>
         <Routes>
+          {/* 1. Dedicated Auth Route for the Popup */}
           <Route path='/auth' element={<AuthPage />} />
 
+          {/* 2. Main Application Route */}
           <Route
             path='/'
             element={
@@ -90,6 +87,7 @@ export default function App() {
             }
           />
 
+          {/* 3. Catch-all: Redirect everything else to home */}
           <Route path='*' element={<Navigate to='/' />} />
         </Routes>
       </div>
