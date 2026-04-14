@@ -5,6 +5,7 @@ import { Sun, Moon, Plus, LogOut, Loader2 } from 'lucide-react'
 import { useJobModalStore } from '../store/useJobModalStore'
 import { useAuthStore } from '../store/useAuthStore'
 import { useThemeStore } from '../store/useThemeStore'
+import { supabase } from '../lib/supabase'
 
 export default function Navbar() {
   const { isDarkMode, toggleTheme } = useThemeStore()
@@ -15,7 +16,10 @@ export default function Navbar() {
   const handleLogout = async () => {
     setIsPending(true)
     try {
-      await clearAuth()
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+
+      clearAuth()
     } catch (error) {
       console.error('Logout failed:', error)
       setIsPending(false)
