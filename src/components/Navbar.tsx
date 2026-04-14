@@ -9,13 +9,13 @@ import { useThemeStore } from '../store/useThemeStore'
 export default function Navbar() {
   const { isDarkMode, toggleTheme } = useThemeStore()
   const { openAddModal } = useJobModalStore()
-  const signOut = useAuthStore((state) => state.signOut)
+  const clearAuth = useAuthStore((state) => state.clearAuth)
   const [isPending, setIsPending] = useState(false)
 
   const handleLogout = async () => {
     setIsPending(true)
     try {
-      await signOut()
+      await clearAuth()
     } catch (error) {
       console.error('Logout failed:', error)
       setIsPending(false)

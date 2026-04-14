@@ -21,8 +21,8 @@ export default function AddJobModal() {
   const { isOpen, closeModal, editingJob } = useJobModalStore()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState(initialState)
-  const session = useAuthStore((state) => state.session)
   const { createJob, updateJob } = useJobMutations()
+  const { user } = useAuthStore()
 
   useEffect(() => {
     if (editingJob) {
@@ -44,16 +44,15 @@ export default function AddJobModal() {
     setFormData((prev) => ({ ...prev, salary: salaryForDB(formatted) }))
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!session?.user) return
 
     setLoading(true)
     try {
       if (editingJob) {
         await updateJob({ id: editingJob.id, data: formData })
       } else {
-        await createJob({ data: formData, userId: session.user.id })
+        await createJob({ data: formData, userId: user?.id })
       }
       closeModal()
     } catch (error) {

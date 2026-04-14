@@ -7,8 +7,20 @@ export const useJobMutations = () => {
 
   // 1. Create Mutation
   const createMutation = useMutation({
-    mutationFn: ({ data, userId }: { data: JobAppData; userId: string }) =>
-      jobApi.create({ data, userId }),
+    mutationFn: ({
+      data,
+      userId,
+    }: {
+      data: JobAppData
+      userId: string | undefined
+    }) => {
+      if (!userId) {
+        throw new Error('User ID is required to create an application')
+      }
+
+      // 2. Now TypeScript knows userId is a string here
+      return jobApi.create({ data, userId })
+    },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })

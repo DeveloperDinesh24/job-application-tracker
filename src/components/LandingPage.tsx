@@ -1,10 +1,7 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 
-interface LandingPageProps {
-  onLoginClick: () => void
-}
-
-export default function LandingPage({ onLoginClick }: LandingPageProps) {
+export default function LandingPage() {
   return (
     <div className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950 px-6 transition-colors duration-500'>
       {/* Dynamic Background Glow - Adjusts opacity for themes */}
@@ -33,12 +30,11 @@ export default function LandingPage({ onLoginClick }: LandingPageProps) {
 
         <div className='flex flex-col sm:flex-row items-center justify-center gap-4'>
           {/* Main CTA */}
-          <button
-            onClick={onLoginClick}
-            className='w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all active:scale-95 shadow-xl shadow-blue-500/25 dark:shadow-blue-900/20'
-          >
-            Get Started Now
-          </button>
+          <Link to='/auth'>
+            <button className='w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all active:scale-95 shadow-xl shadow-blue-500/25 dark:shadow-blue-900/20'>
+              Get Started Now
+            </button>
+          </Link>
 
           {/* Secondary CTA */}
           <button className='w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm'>
@@ -47,7 +43,6 @@ export default function LandingPage({ onLoginClick }: LandingPageProps) {
         </div>
       </motion.div>
 
-      {/* Visual Decor: Tech Grid Overlay */}
       <div className='absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05] bg-[url("https://www.transparenttextures.com/patterns/carbon-fibre.png")]' />
     </div>
   )

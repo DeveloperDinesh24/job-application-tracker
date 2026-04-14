@@ -1,19 +1,32 @@
 import { create } from 'zustand'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase' // Import it directly at the top
 
 interface AuthState {
-  session: Session | null
-  setSession: (session: Session | null) => void
-  signOut: () => Promise<void>
+  user: Session['user'] | null
+  loading: boolean
+  setUser: (user: Session['user'] | null) => void
+  setLoading: (isLoading: boolean) => void
+  clearAuth: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  session: null,
-  setSession: (session) => set({ session }),
-  signOut: async () => {
-    // No need for the complex 'await import' anymore
-    await supabase.auth.signOut()
-    set({ session: null })
-  },
+  user: null,
+  loading: true,
+
+  setUser: (user) =>
+    set({
+      user,
+      loading: false,
+    }),
+
+  setLoading: (isLoading) =>
+    set({
+      loading: isLoading,
+    }),
+
+  clearAuth: () =>
+    set({
+      user: null,
+      loading: false,
+    }),
 }))

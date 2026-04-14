@@ -1,15 +1,11 @@
 import { motion } from 'framer-motion'
-import { type Session } from '@supabase/supabase-js'
 
 import MainSection from './MainSection'
 import Navbar from './Navbar'
 import { useApplications } from './features/hooks/useJobs'
 
-function DashboardUI({ session }: { session: Session | null }) {
+function DashboardUI() {
   const { isLoading } = useApplications()
-
-  // For debugging, we can keep the user email log to ensure session is active
-  console.log('Active User:', session?.user?.email)
 
   if (isLoading) {
     return (

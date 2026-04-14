@@ -1,36 +1,41 @@
 import './App.css'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import LandingPage from './components/LandingPage'
 import DashboardUI from './components/DashboardUI'
 import AuthPage from './components/AuthPage'
 import { useAuthStore } from './store/useAuthStore'
 import { useThemeStore } from './store/useThemeStore'
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 export default function App() {
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
-  const { session, setSession } = useAuthStore()
-  const [loading, setLoading] = useState(true)
-  const isPopup = window.opener !== null
+
+  const { user, loading, setUser } = useAuthStore()
 
   useEffect(() => {
+    // Define function to check for existing session on app load
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      setUser(session?.user ?? null)
+      // setUser automatically sets loading to false in your store!
+    }
+
+    // 1. Check for an existing session on mount
+    checkSession()
+
+    // 2. Listen for changes (Login, Logout, Token Refresh)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session)
-      // If this is a popup and we just signed in, try to close it from here too
-      if (session && isPopup) {
-        window.close()
-      }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
     })
+
+    // 3. Cleanup subscription on unmount
     return () => subscription.unsubscribe()
-  }, [setSession])
+  }, [setUser])
 
   // Sync Theme with DOM
   useEffect(() => {
@@ -44,22 +49,6 @@ export default function App() {
     }
   }, [isDarkMode])
 
-  // Auth Session Logic
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setLoading(false)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [setSession])
-
   if (loading) {
     return (
       <div className='h-screen w-screen flex items-center justify-center bg-white dark:bg-slate-950 text-slate-900 dark:text-white'>
@@ -69,42 +58,25 @@ export default function App() {
   }
 
   return (
-    <Router>
-      <div className='min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300'>
-        <Routes>
-          {/* 1. Dedicated Auth Route for the Popup */}
-          <Route path='/auth' element={<AuthPage />} />
+    <div className='min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300'>
+      <Routes>
+        {/* Home Route */}
+        <Route path='/' element={<LandingPage />} />
 
-          {/* 2. Main Application Route */}
-          <Route
-            path='/'
-            element={
-              !session ? (
-                <LandingPage
-                  onLoginClick={() => {
-                    const width = 500
-                    const height = 600
-                    const left =
-                      window.screenX + (window.outerWidth - width) / 2
-                    const top =
-                      window.screenY + (window.outerHeight - height) / 2
-                    window.open(
-                      '/auth',
-                      'AuthWindow',
-                      `width=${width},height=${height},left=${left},top=${top}`,
-                    )
-                  }}
-                />
-              ) : (
-                <DashboardUI session={session} />
-              )
-            }
-          />
+        {/* Auth Route: If already logged in, skip to dashboard */}
+        <Route
+          path='/auth'
+          element={!user ? <AuthPage /> : <Navigate to='/dashboard' />}
+        />
 
-          {/* 3. Catch-all: Redirect everything else to home */}
-          <Route path='*' element={<Navigate to='/' />} />
-        </Routes>
-      </div>
-    </Router>
+        {/* Protected Dashboard Route */}
+        <Route
+          path='/dashboard'
+          element={user ? <DashboardUI /> : <Navigate to='/auth' />}
+        />
+
+        <Route path='*' element={<Navigate to='/' />} />
+      </Routes>
+    </div>
   )
 }
