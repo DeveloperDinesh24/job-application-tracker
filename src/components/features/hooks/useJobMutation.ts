@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { jobApi } from '../services/jobApi'
 import type { JobAppData, JobAppUpdateData } from '../types/job.types'
+import toast from 'react-hot-toast'
 
 export const useJobMutations = () => {
   const queryClient = useQueryClient()
@@ -24,6 +25,10 @@ export const useJobMutations = () => {
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
+      toast.success('Application added!')
+    },
+    onError: () => {
+      toast.error('Failed to add application. Please try again.')
     },
   })
 
@@ -33,14 +38,25 @@ export const useJobMutations = () => {
       jobApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
+      toast.success('Application updated!')
+    },
+    onError: () => {
+      toast.error('Failed to edit application. Please try again.')
     },
   })
 
   // 3. Delete Mutation
   const deleteMutation = useMutation({
-    mutationFn: jobApi.delete,
+    // Explicitly pass the id through
+    mutationFn: (id: number) => jobApi.delete(id),
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
+      toast.success('Application deleted!')
+    },
+    onError: (error: Error) => {
+      console.error('Delete Error:', error)
+      toast.error('Failed to delete application.')
     },
   })
 

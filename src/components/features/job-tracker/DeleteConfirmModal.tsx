@@ -1,23 +1,22 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import { useDeleteModalStore } from '../../../store/useDeleteModalStore'
-import { jobApi } from '../services/jobApi'
+import { useJobMutations } from '../hooks/useJobMutation'
 
 export default function DeleteConfirmModal() {
   const { isOpen, id, companyName, closeDeleteModal } = useDeleteModalStore()
-  const queryClient = useQueryClient()
   const [loading, setLoading] = useState(false)
+  const { deleteJob } = useJobMutations()
 
   const handleConfirm = async () => {
     if (!id) return
     setLoading(true)
 
     try {
-      await jobApi.delete(id)
+      await deleteJob(id)
+
       closeDeleteModal()
-      queryClient.invalidateQueries({ queryKey: ['applications'] })
     } catch (err) {
       console.error('Delete failed', err)
     } finally {

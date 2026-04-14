@@ -7,6 +7,7 @@ import AuthPage from './components/AuthPage'
 import { useAuthStore } from './store/useAuthStore'
 import { useThemeStore } from './store/useThemeStore'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 
 export default function App() {
   const isDarkMode = useThemeStore((state) => state.isDarkMode)
@@ -59,6 +60,7 @@ export default function App() {
 
   return (
     <div className='min-h-screen bg-white dark:bg-slate-950 transition-colors duration-300'>
+      <Toaster position='top-right' reverseOrder={false} />
       <Routes>
         {/* Home Route */}
         <Route path='/' element={<LandingPage />} />
