@@ -22,13 +22,13 @@
 * **Intelligent UI:** Dark mode support with a polished, glassmorphism-inspired design.
 * **Optimized Performance:** Fast data synchronization and "optimistic UI" feel using TanStack Query.
 * **Responsive Design:** Fully mobile-responsive layouts for tracking on the go.
+* **Toast Notifications:** A notification popups when job app is added, edited or deleted.
 
 ---
 
 ### 🚧 Work in Progress
 
 * **Enhanced Analytics:** Detailed charts to visualize application success rates.
-* **Success Notifications:** Interactive toast notifications for all user actions.
 * **Email Reminders:** Automated follow-up alerts for pending interviews.
 * **Advanced Filtering:** Sort and search through hundreds of applications instantly.
 * *New features and refinements are being added regularly.*
