@@ -2,16 +2,19 @@ import { Briefcase, CheckCircle, Clock } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 import type { JobApp } from '../types/job.types'
+import { useAuthStore } from '../../../store/useAuthStore'
 
 interface StatsOverviewProps {
   data?: JobApp[]
 }
 
 export default function StatsOverview({ data }: StatsOverviewProps) {
+  const { isGuest } = useAuthStore()
+
   const stats = [
     {
       label: 'Total Apps',
-      val: data?.length || 0,
+      val: `${data?.length || 0}${isGuest ? ' / 5' : ''}`,
       icon: Briefcase,
       color: 'text-blue-500 dark:text-blue-400',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
