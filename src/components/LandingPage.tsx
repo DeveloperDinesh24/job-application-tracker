@@ -1,7 +1,16 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/useAuthStore'
 
 export default function LandingPage() {
+  const navigate = useNavigate()
+  const loginAsGuest = useAuthStore((state) => state.loginAsGuest)
+
+  const handleGuestLogin = () => {
+    loginAsGuest()
+    navigate('/dashboard') // Or your main app route
+  }
+
   return (
     <div className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950 px-6 transition-colors duration-500'>
       {/* Dynamic Background Glow - Adjusts opacity for themes */}
@@ -37,7 +46,10 @@ export default function LandingPage() {
           </Link>
 
           {/* Secondary CTA */}
-          <button className='w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm'>
+          <button
+            onClick={handleGuestLogin}
+            className='w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 shadow-sm'
+          >
             Sign in as Guest
           </button>
         </div>
