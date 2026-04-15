@@ -1,5 +1,6 @@
 export interface JobApp {
   id: number
+  user_id: string
   created_at: string
   company: string
   role: string
