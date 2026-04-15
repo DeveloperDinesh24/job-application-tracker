@@ -14,7 +14,7 @@ export default function LandingPage() {
   return (
     <div className='relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-slate-50 dark:bg-slate-950 px-6 transition-colors duration-500'>
       {/* Dynamic Background Glow - Adjusts opacity for themes */}
-      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 dark:bg-blue-600/20 blur-[120px] rounded-full' />
+      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-125 h-125 bg-blue-500/10 dark:bg-blue-600/20 blur-[120px] rounded-full' />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
