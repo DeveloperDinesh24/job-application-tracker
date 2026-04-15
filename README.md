@@ -19,6 +19,7 @@
 * **Secure Authentication:** Social login integration with Google, GitHub, and LinkedIn via Supabase.
 * **Dynamic Dashboard:** Real-time stats overview of total applications, interviews, and offers.
 * **Job Management:** Full CRUD functionality to add, edit, and track job applications.
+* **Guest Mode:** Explore the dashboard with a local-storage session, allowing up to 5 job applications without creating an account.
 * **Intelligent UI:** Dark mode support with a polished, glassmorphism-inspired design.
 * **Optimized Performance:** Fast data synchronization and "optimistic UI" feel using TanStack Query.
 * **Responsive Design:** Fully mobile-responsive layouts for tracking on the go.
