@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, GitFork, Globe, Lock, Mail } from 'lucide-react'
+import { ArrowLeft, ArrowRight, GitFork, Globe, Lock, Mail } from 'lucide-react'
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true)
@@ -160,6 +160,17 @@ const AuthPage = () => {
             {isLogin ? 'Sign up for free' : 'Log in here'}
           </button>
         </p>
+        <div className='flex justify-center mt-8'>
+          <button
+            onClick={() => {
+              navigate('/')
+            }}
+            className='flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-white/10 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-slate-400 hover:text-white text-sm font-medium rounded-xl transition-all duration-300 active:scale-95 cursor-pointer group'
+          >
+            <ArrowLeft className='w-4 h-4 group-hover:-translate-x-1 transition-transform' />
+            Back To HomePage
+          </button>
+        </div>
       </div>
     </div>
   )
