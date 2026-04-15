@@ -10,7 +10,7 @@ import { supabase } from '../lib/supabase'
 export default function Navbar() {
   const { isDarkMode, toggleTheme } = useThemeStore()
   const { openAddModal } = useJobModalStore()
-  const clearAuth = useAuthStore((state) => state.clearAuth)
+  const { clearAuth, isGuest } = useAuthStore()
   const [isPending, setIsPending] = useState(false)
 
   const handleLogout = async () => {
@@ -79,7 +79,13 @@ export default function Navbar() {
               <LogOut size={18} />
             )}
             <span className='hidden md:inline'>
-              {isPending ? 'Logging out...' : 'Log Out'}
+              {isPending
+                ? isGuest
+                  ? 'Exiting...'
+                  : 'Logging out...'
+                : isGuest
+                  ? 'Exit as Guest'
+                  : 'Log Out'}
             </span>
           </button>
         </div>
