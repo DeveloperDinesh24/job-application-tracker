@@ -6,12 +6,15 @@ import { useJobModalStore } from '../store/useJobModalStore'
 import { useAuthStore } from '../store/useAuthStore'
 import { useThemeStore } from '../store/useThemeStore'
 import { supabase } from '../lib/supabase'
+import { useNavigate } from 'react-router-dom'
 
 export default function Navbar() {
   const { isDarkMode, toggleTheme } = useThemeStore()
   const { openAddModal } = useJobModalStore()
   const { clearAuth, isGuest } = useAuthStore()
   const [isPending, setIsPending] = useState(false)
+
+  const navigate = useNavigate()
 
   const handleLogout = async () => {
     setIsPending(true)
@@ -20,6 +23,7 @@ export default function Navbar() {
       if (error) throw error
 
       clearAuth()
+      navigate('/')
     } catch (error) {
       console.error('Logout failed:', error)
       setIsPending(false)
